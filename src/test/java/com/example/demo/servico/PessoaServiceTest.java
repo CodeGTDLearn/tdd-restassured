@@ -2,8 +2,8 @@ package com.example.demo.servico;
 
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.repo.PessoaRepo;
+import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
 import com.example.demo.servico.impl.PessoaServiceImpl;
-
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,9 +12,12 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpf;
-import static org.mockito.Mockito.verify;
+import java.util.Optional;
 
+import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpf;
+import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfDiverso;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 public class PessoaServiceTest {
@@ -28,18 +31,19 @@ public class PessoaServiceTest {
 
     @Before
     public void setUp() {
-      service = new PessoaServiceImpl(repo);
+        service = new PessoaServiceImpl(repo);
+        pessoa = pessoaComCpf().gerar();
     }
 
     @Test
-    public void savingPersonInRepo() {
-        pessoa = pessoaComCpf().gerar();
+    public void savingPersonInRepo() throws PessoaComCpfDuplicado {
         service.save(pessoa);
         verify(repo).save(pessoa);
     }
 
-    @Test
-    public void avoidPersonsWithCpfDuplicity() {
-        
+    @Test(expected = PessoaComCpfDuplicado.class)
+    public void blockingSaveMethosInPeopleWithDuplicity() throws PessoaComCpfDuplicado {
+        when(repo.findByCpf(pessoa.getCpf())).thenReturn(Optional.of(pessoa));
+        service.save(pessoa);
     }
 }
