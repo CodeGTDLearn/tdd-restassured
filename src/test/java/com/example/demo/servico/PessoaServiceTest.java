@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Optional;
 
 import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpf;
-import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfDiverso;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

@@ -6,25 +6,32 @@ import lombok.Builder;
 import lombok.Builder.*;
 import lombok.Getter;
 
-@Builder
-@Getter
+import java.util.Locale;
+
+@Builder @Getter
 public class PessoaBuilder {
+    private Pessoa pessoa;
 
-    private Pessoa pessoa;   //variavel de instancia do DataBuilder
-    private static String REGEX_CPF = "[0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}";
-
-    @Default
-    private static String nome = Faker.instance().name().fullName();
+    private static Faker faker = new Faker(new Locale("en-BR"));
+    private static String FAKER_REGEX_CPF = "[0-9]{3}\\.[0-9]{3}\\.[0-9]{3}-[0-9]{2}";
 
     @Default
-    private static String cpf = Faker.instance().regexify(REGEX_CPF).trim();
+    private static String nome = faker.name().fullName();
+
+    @Default
+    private static String cpf = faker.regexify(FAKER_REGEX_CPF).trim();
 
     public static PessoaBuilder pessoaComCpf() {
-
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(nome);
         pessoa.setCpf(cpf);
+        return PessoaBuilder.builder().pessoa(pessoa).build();
+    }
 
+    public static PessoaBuilder pessoaComCpfDiverso() {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setNome(nome);
+        pessoa.setCpf(Faker.instance().regexify(FAKER_REGEX_CPF).trim());
         return PessoaBuilder.builder().pessoa(pessoa).build();
     }
 
