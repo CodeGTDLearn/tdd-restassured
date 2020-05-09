@@ -1,7 +1,7 @@
-package com.example.demo.servico;
+package com.example.demo.repo;
 
 import com.example.demo.modelo.Pessoa;
 
-public interface PessoaService {
+public interface PessoaRepo {
     Pessoa save(Pessoa pessoa);
 }
