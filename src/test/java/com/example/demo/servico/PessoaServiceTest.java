@@ -5,6 +5,7 @@ import com.example.demo.modelo.Telefone;
 import com.example.demo.repo.PessoaRepo;
 import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
 import com.example.demo.servico.exceptions.PessoaComTelDuplicado;
+import com.example.demo.servico.exceptions.TelephoneNotFound;
 import com.example.demo.servico.impl.PessoaServiceImpl;
 
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class PessoaServiceTest {
     }
 
     @Test
-    public void findPersonByTelephone() {
+    public void findPersonByTelephone() throws TelephoneNotFound {
         Pessoa person = service.findByTelephone(pessoaComCpfeTel().gerar().getTelefones().get(0));
     }
 }
