@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Optional;
 
 import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfeTel;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,13 +67,16 @@ public class PessoaServiceTest {
         final String ddd = pessoa.getTelefones().get(0).getDdd();
         final String numero = pessoa.getTelefones().get(0).getNumero();
 
-        when(repo.findByTel(ddd,numero)).thenReturn(Optional.of(pessoa));
+        when(repo.findByTel(ddd, numero)).thenReturn(Optional.of(pessoa));
 
         Pessoa person = service.findByTelephone(pessoa.getTelefones().get(0));
 
-        verify(repo).findByTel(ddd,numero);
-        
-        AssertThat(person).isNotNull();
+        verify(repo).findByTel(ddd, numero);
+
+        assertThat(person).isNotNull();
+        assertThat(person.getNome()).isEqualTo(person.getNome());
+        assertThat(person.getCpf()).isEqualTo(person.getCpf());
+        assertThat(person.getTelefones().get(0).getNumero()).isEqualTo(numero);
 
     }
 }
