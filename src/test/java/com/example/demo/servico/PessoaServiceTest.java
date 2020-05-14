@@ -6,7 +6,7 @@ import com.example.demo.repo.PessoaRepo;
 import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
 import com.example.demo.servico.exceptions.PessoaComTelDuplicado;
 import com.example.demo.servico.impl.PessoaServiceImpl;
-//teste
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
