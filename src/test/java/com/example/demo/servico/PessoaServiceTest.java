@@ -26,7 +26,7 @@ public class PessoaServiceTest {
     @MockBean
     private PessoaRepo repo;
 
-    private PessoaService service;
+    private PessoaServiceInt service;
 
     private Pessoa pessoa;
 
@@ -57,5 +57,10 @@ public class PessoaServiceTest {
         when(repo.findByTel(ddd, numero)).thenReturn(Optional.of(pessoa));
         service.save(pessoa);
 
+    }
+
+    @Test
+    public void findPersonByTelephone() {
+        Pessoa person = service.findByTelephone(pessoaComCpfeTel().gerar().getTelefones().get(0));
     }
 }
