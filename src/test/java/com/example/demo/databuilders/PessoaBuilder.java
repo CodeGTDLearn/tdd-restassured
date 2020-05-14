@@ -21,6 +21,11 @@ public class PessoaBuilder {
     @Default
     private static String cpf = faker.regexify(FAKER_REGEX_CPF).trim();
 
+    @Default
+    private static String ddd = faker.phoneNumber().extension();
+    @Default
+    private static String telNumero = faker.phoneNumber().phoneNumber();
+
     public static PessoaBuilder pessoaComCpf() {
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(nome);
@@ -35,7 +40,24 @@ public class PessoaBuilder {
         return PessoaBuilder.builder().pessoa(pessoa).build();
     }
 
+    public static PessoaBuilder pessoaComCpfeTel() {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setNome(nome);
+        pessoa.setCpf(cpf);
+
+        tel = new Telefone();
+        tel.setDdd(ddd);
+        tel.setNumero(telNumero);
+        pessoa.setNome(nome);
+        pessoa.setTelefones(Arrays.asList(tel));
+        return PessoaBuilder.builder().pessoa(pessoa).build();
+    }
+
     public Pessoa gerar() {
         return this.pessoa;
+    }
+
+    public Telefone retornaTel() {
+        return this.tel;
     }
 }
