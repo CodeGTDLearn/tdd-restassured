@@ -4,6 +4,7 @@ import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.Telefone;
 import com.github.javafaker.Faker;
 import lombok.Builder;
+//import lombok.Builder;
 import lombok.Builder.*;
 import lombok.Getter;
 
