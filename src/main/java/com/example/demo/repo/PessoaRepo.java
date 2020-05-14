@@ -8,4 +8,6 @@ public interface PessoaRepo {
     Pessoa save(Pessoa pessoa);
 
     Optional<Pessoa> findByCpf(String cpf);
+
+    Optional<Pessoa> findByTel(String ddd, String numero);
 }

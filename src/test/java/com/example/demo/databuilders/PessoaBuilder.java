@@ -1,16 +1,20 @@
 package com.example.demo.databuilders;
 
 import com.example.demo.modelo.Pessoa;
+import com.example.demo.modelo.Telefone;
 import com.github.javafaker.Faker;
 import lombok.Builder;
 import lombok.Builder.*;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.Locale;
 
-@Builder @Getter
+@Builder
+@Getter
 public class PessoaBuilder {
     private Pessoa pessoa;
+    private static Telefone tel;
 
     private static Faker faker = new Faker(new Locale("en-BR"));
     private static String FAKER_REGEX_CPF = "[0-9]{3}\\.[0-9]{3}\\.[0-9]{3}-[0-9]{2}";
