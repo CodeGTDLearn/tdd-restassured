@@ -1,5 +1,5 @@
 package com.example.demo.servico;
-
+//teste master
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.Telefone;
 import com.example.demo.repo.PessoaRepo;
@@ -59,6 +59,13 @@ public class PessoaServiceTest {
         when(repo.findByTel(ddd, numero)).thenReturn(Optional.of(pessoa));
         service.save(pessoa);
 
+    }
+
+
+    @Test(expected = TelephoneNotFound.class)
+    public void findPersonByTelephoneFail() throws TelephoneNotFound {
+        Telefone tel = pessoaComCpfeTel().gerar().getTelefones().get(0);
+        service.findByTelephone(tel);
     }
 
     @Test
