@@ -62,6 +62,17 @@ public class PessoaServiceTest {
 
     @Test
     public void findPersonByTelephone() throws TelephoneNotFound {
-        Pessoa person = service.findByTelephone(pessoaComCpfeTel().gerar().getTelefones().get(0));
+        pessoa = pessoaComCpfeTel().gerar();
+        final String ddd = pessoa.getTelefones().get(0).getDdd();
+        final String numero = pessoa.getTelefones().get(0).getNumero();
+
+        when(repo.findByTel(ddd,numero)).thenReturn(Optional.of(pessoa));
+
+        Pessoa person = service.findByTelephone(pessoa.getTelefones().get(0));
+
+        verify(repo).findByTel(ddd,numero);
+        
+        AssertThat(person).isNotNull();
+
     }
 }
