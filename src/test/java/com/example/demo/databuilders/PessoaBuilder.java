@@ -5,11 +5,13 @@ import com.example.demo.modelo.Telefone;
 import com.github.javafaker.Faker;
 import lombok.Builder;
 import lombok.Builder.*;
+//import lombok.Data;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Locale;
 
+//@Data
 @Builder
 @Getter
 public class PessoaBuilder {
