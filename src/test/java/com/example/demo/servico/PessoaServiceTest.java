@@ -7,7 +7,7 @@ import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
 import com.example.demo.servico.exceptions.PessoaComTelDuplicado;
 import com.example.demo.servico.exceptions.TelephoneNotFound;
 import com.example.demo.servico.impl.PessoaServiceImpl;
-//FINAL DE TESTE
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
