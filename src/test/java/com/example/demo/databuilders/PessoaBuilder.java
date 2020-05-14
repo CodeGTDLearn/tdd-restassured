@@ -11,7 +11,7 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Locale;
 
-//@Data
+
 @Builder
 @Getter
 public class PessoaBuilder {
