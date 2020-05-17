@@ -29,6 +29,7 @@ public class PessoaBuilder {
 
     @Default
     private static String ddd = faker.phoneNumber().extension();
+
     @Default
     private static String telNumero = faker.phoneNumber().phoneNumber();
 
@@ -61,9 +62,5 @@ public class PessoaBuilder {
 
     public Pessoa gerar() {
         return this.pessoa;
-    }
-
-    public Telefone retornaTel() {
-        return this.tel;
     }
 }

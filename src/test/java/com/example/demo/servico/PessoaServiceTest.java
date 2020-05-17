@@ -2,7 +2,7 @@ package com.example.demo.servico;
 //teste master
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.Telefone;
-import com.example.demo.repo.PessoaRepo;
+import com.example.demo.repo.PessoaRepoInt;
 import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
 import com.example.demo.servico.exceptions.PessoaComTelDuplicado;
 import com.example.demo.servico.exceptions.TelephoneNotFound;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 public class PessoaServiceTest {
 
     @MockBean
-    private PessoaRepo repo;
+    private PessoaRepoInt repo;
 
     private PessoaServiceInt service;
 

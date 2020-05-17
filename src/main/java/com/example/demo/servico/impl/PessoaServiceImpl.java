@@ -2,7 +2,7 @@ package com.example.demo.servico.impl;
 
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.Telefone;
-import com.example.demo.repo.PessoaRepo;
+import com.example.demo.repo.PessoaRepoInt;
 import com.example.demo.servico.PessoaServiceInt;
 import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
 import com.example.demo.servico.exceptions.PessoaComTelDuplicado;
@@ -10,9 +10,9 @@ import com.example.demo.servico.exceptions.TelephoneNotFound;
 
 public class PessoaServiceImpl implements PessoaServiceInt {
 
-    private final PessoaRepo repo;
+    private final PessoaRepoInt repo;
 
-    public PessoaServiceImpl(PessoaRepo repo) {
+    public PessoaServiceImpl(PessoaRepoInt repo) {
         this.repo = repo;
     }
 

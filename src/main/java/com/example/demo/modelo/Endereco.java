@@ -2,16 +2,22 @@ package com.example.demo.modelo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
-@Data
-//@Entity
-//@Table(name = "endereco")
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
+@Table(name = "endereco")
 public class Endereco {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
     private String logradouro;
@@ -21,8 +27,8 @@ public class Endereco {
     private String cidade;
     private String estado;
 
-//    @ManyToOne
-//    @JoinColumn(name = "codigo_pessoa")
-//    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "codigo_pessoa")
+    @JsonIgnore
     private Pessoa pessoa;
 }
