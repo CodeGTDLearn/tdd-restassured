@@ -1,7 +1,9 @@
 package com.example.demo.repo;
 
 import com.example.demo.modelo.Pessoa;
-import com.example.demo.repo.filtro.FiltroPessoa;
+import com.example.demo.repo.filtro.FiltroPessoaCascade;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,59 +15,97 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfeTel;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@Sql(value = "/load-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "/clean-db.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-@RunWith(SpringRunner.class)
+
+@TestPropertySource("classpath:application.properties")
+@Sql(value = "/load-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/clean-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DataJpaTest
-@TestPropertySource("classpath:application-test.properties")
+@RunWith(SpringRunner.class)
 public class PessoaRepoTest {
 
     @Autowired
-    PessoaRepoInt repo;
+    private PessoaRepoInt repo;
 
-    @Test
-    public void procura_pessoa_pelo_cpf() throws Exception {
-        Optional<Pessoa> optional = repo.findByCpf("38767897100");
-        assertThat(optional.isPresent()).isTrue();
+    private Pessoa pessoa1;
+    private Pessoa pessoa2;
 
-        Pessoa pessoaTestada = optional.get();
-        assertThat(pessoaTestada.getCodigo()).isEqualTo(3L);
-        assertThat(pessoaTestada.getNome()).isEqualTo("Cauê");
-        assertThat(pessoaTestada.getCpf()).isEqualTo("38767897100");
+    @Before
+    public void setUp() throws Exception {
+        pessoa1 = pessoaComCpfeTel().gerar();
+        pessoa2 = pessoaComCpfeTel().gerar();
+        repo.save(pessoa1);
+    }
+
+    @After
+    public void tearDown() {
+        repo.delete(pessoa1);
     }
 
     @Test
-    public void not_find_pessoa_by_cpf() throws Exception {
-        Optional<Pessoa> optional = repo.findByCpf("3876789710000");
+    public void procura_pessoa_pelo_cpf() {
+
+        Optional<Pessoa> optional = repo.findByCpf(pessoa1.getCpf());
+        assertThat(optional.isPresent()).isTrue();
+
+        Pessoa pessoaTestada = optional.get();
+        assertThat(pessoaTestada.getCodigo()).isEqualTo(pessoa1.getCodigo());
+        assertThat(pessoaTestada.getNome()).isEqualTo(pessoa1.getNome());
+        assertThat(pessoaTestada.getCpf()).isEqualTo(pessoa1.getCpf());
+    }
+
+    @Test
+    public void not_find_pessoa_by_cpf() {
+        Optional<Pessoa> optional = repo.findByCpf(pessoa2.getCpf());
         assertThat(optional.isPresent()).isFalse();
     }
 
     @Test
-    public void find_person_by_tel_with_ddd_tel() throws Exception {
-        Optional<Pessoa> optional = repo.findByTel("86", "35006330");
+    public void find_person_by_tel_with_ddd() {
+        Optional<Pessoa> optional = repo.findFirstByOrderByNomeAsc();
+        Pessoa pessoaSource = optional.get();
 
-        assertThat(optional.isPresent()).isTrue();
+        String ddd = pessoaSource.getTelefones().get(0).getDdd();
+        String numero = pessoaSource.getTelefones().get(0).getNumero();
+        int teste = 1;
 
-        Pessoa pessoaTestada = optional.get();
-        assertThat(pessoaTestada.getCodigo()).isEqualTo(3L);
-        assertThat(pessoaTestada.getNome()).isEqualTo("Cauê");
-        assertThat(pessoaTestada.getCpf()).isEqualTo("38767897100");
+        Optional<Pessoa> optional2 = repo.findByTelDdd(ddd, numero);
+        assertThat(optional2.isPresent()).isTrue();
+
+        Pessoa pessoaTarget = optional2.get();
+        assertThat(pessoaSource.getCodigo()).isEqualTo(pessoaTarget.getCodigo());
+        assertThat(pessoaSource.getNome()).isEqualTo(pessoaTarget.getNome());
+        assertThat(pessoaSource.getCpf()).isEqualTo(pessoaTarget.getCpf());
     }
 
     @Test
-    public void not_find_person_by_tel_with_ddd_tel() throws Exception {
-        Optional<Pessoa> optional = repo.findByCpf("387678971001111");
+    public void not_find_person_by_tel_with_ddd_tel() {
+        String ddd = pessoa2.getTelefones().get(0).getDdd();
+        String numero = pessoa2.getTelefones().get(0).getNumero();
+
+        Optional<Pessoa> optional = repo.findByTelDdd(ddd, numero);
+
         assertThat(optional.isPresent()).isFalse();
     }
 
     @Test
-    public void filter_using_name_fraction() throws Exception {
-        FiltroPessoa p = FiltroPessoa.builder()
-                .nome("a").cpf("0").ddd("86").phone("5701").build();
+    public void multiFilterTest() {
+        FiltroPessoaCascade filtro =
+                FiltroPessoaCascade
+                        .builder()
+                        .nome("a")
+                        .cpf("4")
+                        .phone("38416516")
+                        .build();
 
-        List<Pessoa> pessoas = repo.multFilter(p.getNome(), p.getCpf(), p.getDdd(), p.getPhone());
+        List<Pessoa> pessoas =
+                repo.findByMultiFilterCascade(
+                        filtro.getNome(),
+                        filtro.getCpf(),
+                        filtro.getDdd(),
+                        filtro.getPhone());
         assertThat(pessoas.size()).isEqualTo(1);
     }
 }

@@ -1,8 +1,11 @@
 package com.example.demo.modelo;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -22,12 +25,13 @@ public class Pessoa {
     @Column(length = 80, nullable = false)
     private String nome;
 
-    @Column(length = 11, nullable = false)
+    @Column(length = 14, nullable = false)
     private String cpf;
 
-    @OneToMany(mappedBy = "pessoa")
+    @OneToMany(mappedBy = "pessoa", fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Endereco> enderecos;
 
-    @OneToMany(mappedBy = "pessoa")
+    @OneToMany(mappedBy = "pessoa", fetch = FetchType.EAGER)
     private List<Telefone> telefones;
 }

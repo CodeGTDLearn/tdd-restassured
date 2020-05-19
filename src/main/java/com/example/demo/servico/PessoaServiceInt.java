@@ -2,12 +2,17 @@ package com.example.demo.servico;
 
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.Telefone;
-import com.example.demo.servico.exceptions.PessoaComCpfDuplicado;
-import com.example.demo.servico.exceptions.PessoaComTelDuplicado;
-import com.example.demo.servico.exceptions.TelephoneNotFound;
+import com.example.demo.repo.filtro.FiltroPessoaCascade;
+import com.example.demo.servico.exceptions.CpfDuplicadoException;
+import com.example.demo.servico.exceptions.TelDuplicadoException;
+import com.example.demo.servico.exceptions.TelephoneNotFoundException;
+
+import java.util.List;
 
 public interface PessoaServiceInt {
-    Pessoa save(Pessoa pessoa) throws PessoaComCpfDuplicado, PessoaComTelDuplicado;
+    Pessoa save(Pessoa pessoa) throws TelDuplicadoException, CpfDuplicadoException;
 
-    Pessoa findByTelephone(Telefone telefone) throws TelephoneNotFound;
+    Pessoa findByTelephone(Telefone telefone) throws TelephoneNotFoundException;
+
+    List<Pessoa> findByMultiFilterCascade(FiltroPessoaCascade filter);
 }

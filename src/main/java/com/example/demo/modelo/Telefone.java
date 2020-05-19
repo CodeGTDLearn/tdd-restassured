@@ -1,7 +1,6 @@
 package com.example.demo.modelo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +14,8 @@ import javax.persistence.*;
 @Table(name = "telefone")
 public class Telefone {
 
-    @EqualsAndHashCode.Include
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
