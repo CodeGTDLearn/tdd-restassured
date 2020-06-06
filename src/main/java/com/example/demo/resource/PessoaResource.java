@@ -9,6 +9,7 @@ import com.example.demo.servico.exceptions.TelDuplicadoException;
 import com.example.demo.servico.exceptions.TelephoneNotFoundException;
 import com.example.demo.servico.utils.ErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,7 +42,6 @@ public class PessoaResource {
 
     }
 
-
     @PostMapping
     public ResponseEntity<Pessoa> save(@RequestBody Pessoa pessoa, HttpServletResponse response) throws TelDuplicadoException, CpfDuplicadoException {
 
@@ -58,13 +58,16 @@ public class PessoaResource {
         return new ResponseEntity<>(pessoaToBeSaved, CREATED);
     }
 
-
     @PostMapping("/filtrar")
     public ResponseEntity<List<Pessoa>> findByMultiFilterCascade(@RequestBody FiltroPessoaCascade filtro){
         final List<Pessoa> listPessoas = service.findByMultiFilterCascade(filtro);
         return new ResponseEntity<>(listPessoas, OK);
     }
 
+    @GetMapping
+    List<Pessoa> findAllMockmvc (){
+        return service.findAllMockmvc();
+    }
 
     @ExceptionHandler({TelephoneNotFoundException.class})
     public ResponseEntity<ErrorException> handleTelNotFoundException(TelephoneNotFoundException exceptFromService) {
@@ -73,14 +76,12 @@ public class PessoaResource {
         return new ResponseEntity<>(new ErrorException(exceptFromService.getMessage()), NOT_FOUND);
     }
 
-
     @ExceptionHandler({CpfDuplicadoException.class})
     public ResponseEntity<ErrorException> handleCpfDuplicadoException(CpfDuplicadoException exceptFromService) {
 
         //BAD_REQUEST: org.springframework.http.HttpStatus.*;
         return new ResponseEntity<>(new ErrorException(exceptFromService.getMessage()), BAD_REQUEST);
     }
-
 
     @ExceptionHandler({TelDuplicadoException.class})
     public ResponseEntity<ErrorException> handleTelDuplicadoException(TelDuplicadoException exceptFromService) {

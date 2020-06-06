@@ -8,6 +8,7 @@ import com.example.demo.servico.exceptions.TelDuplicadoException;
 import com.example.demo.servico.exceptions.TelephoneNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PessoaServiceInt {
     Pessoa save(Pessoa pessoa) throws TelDuplicadoException, CpfDuplicadoException;
@@ -15,4 +16,10 @@ public interface PessoaServiceInt {
     Pessoa findByTelephone(Telefone telefone) throws TelephoneNotFoundException;
 
     List<Pessoa> findByMultiFilterCascade(FiltroPessoaCascade filter);
+
+    List<Pessoa> findAllMockmvc();
+
+    Optional<Pessoa> findByTelDdd(String ddd, String numero);
+
+    boolean delete(Pessoa pessoa);
 }

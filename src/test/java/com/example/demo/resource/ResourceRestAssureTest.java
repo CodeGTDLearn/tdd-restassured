@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -22,18 +23,22 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpf;
-import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfTelAddress;
+import static com.example.demo.databuilders.ObjectMotherPessoa.pessoaComCpf;
+import static com.example.demo.databuilders.ObjectMotherPessoa.pessoaComCpfTelAddress;
+import static com.example.demo.repo.filtro.FiltroPessoaCascade.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@Sql(value = "/load-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "/clean-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@Sql(value = "/preload-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/clean-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DirtiesContext
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestPropertySource("classpath:application.properties")
-public class PessoaResourceTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@TestPropertySource("classpath:application-test.properties")
+public class ResourceRestAssureTest {
 
     @Autowired
     private PessoaRepoInt repo;
@@ -72,7 +77,9 @@ public class PessoaResourceTest {
         given()
                 .pathParam("ddd", ddd)
                 .pathParam("numero", numeroTel)
+
                 .get("/pessoas/{ddd}/{numero}")
+
                 .then()
                 .log().headers().and()
                 .log().body().and()
@@ -106,11 +113,14 @@ public class PessoaResourceTest {
         given()
                 .pathParam("ddd", dddPessoa01)
                 .pathParam("numero", numTelPessoa02)
+
                 .get("/pessoas/{ddd}/{numero}")
+
                 .then()
                 .log().headers().and()
                 .log().body().and()
                 .statusCode(HttpStatus.NOT_FOUND.value())
+
                 .body("erro", equalTo(
                         CreateMessage.builder()
                                 .text1(dddPessoa01)
@@ -136,18 +146,24 @@ public class PessoaResourceTest {
                 .request()
                 .header("Accept", ContentType.ANY)
                 .header("Content-type", ContentType.JSON)
+
                 .body(person)
+
                 .when()
                 .post("/pessoas")
+
                 .then()
                 .log().headers().and()
                 .log().body().and()
+
                 .statusCode(HttpStatus.CREATED.value())
+
                 .header("Location",
                         equalTo(
                                 "http://localhost:" + port + "/pessoas/" +
                                         person.getTelefones().get(0).getDdd() + "/" +
                                         person.getTelefones().get(0).getNumero()))
+
                 .body(
                         "nome", equalTo(nome),
                         "cpf", equalTo(cpf),
@@ -157,20 +173,23 @@ public class PessoaResourceTest {
                         "enderecos.bairro", hasItem(bairro));
     }
 
-
     @Test
     public void CpfDuplicadoException() {
         given()
                 .request()
                 .header("Accept", ContentType.ANY)
                 .header("Content-type", ContentType.JSON)
+
                 .body(pessoaSource1)
+
                 .when()
                 .post("/pessoas")
+
                 .then()
                 .log().body()
                 .and()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
+
                 .body("erro", equalTo(CreateMessage.builder()
                         .text1(pessoaSource1.getCpf())
                         .build()
@@ -190,13 +209,17 @@ public class PessoaResourceTest {
                 .request()
                 .header("Accept", ContentType.ANY)
                 .header("Content-type", ContentType.JSON)
+
                 .body(pessoa)
+
                 .when()
                 .post("/pessoas")
+
                 .then()
                 .log().body()
                 .and()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
+
                 .body("erro", equalTo(CreateMessage.builder()
                         .text1(ddd)
                         .text2(numero)
@@ -207,7 +230,7 @@ public class PessoaResourceTest {
     @Test
     public void findByMultiFilterCascade() {
 
-        final FiltroPessoaCascade multiFilter = FiltroPessoaCascade.builder()
+        final FiltroPessoaCascade multiFilter = builder()
                 .nome("a")
                 .cpf("4")
                 .build();
@@ -227,15 +250,41 @@ public class PessoaResourceTest {
                 .request()
                 .header("Accept", ContentType.ANY)
                 .header("Content-type", ContentType.JSON)
+
                 .body(multiFilter)
+
                 .when()
                 .post("/pessoas/filtrar")
+
                 .then()
                 .log().body().and()
                 .statusCode(HttpStatus.OK.value())
+
                 .body("nome",
                         containsInAnyOrder(nome1, nome2),
                         "telefones.ddd", containsInAnyOrder(hasItem(ddd1), hasItem(ddd2)),
                         "enderecos.logradouro", containsInAnyOrder(hasItem(end1), hasItem(end2)));
+    }
+
+    @Test
+    public void findAllMockmvcTest() {
+        List<Pessoa> retornoPessoas = service.findAllMockmvc();
+
+        given()
+                .request()
+                .header("Accept", ContentType.ANY)
+                .header("Content-type", ContentType.JSON)
+
+                .body(retornoPessoas)
+
+                .when()
+                .get("/pessoas")
+
+                .then()
+                .log().body().and()
+                .statusCode(HttpStatus.OK.value())
+                .assertThat()
+
+                .body("size()", is(retornoPessoas.size()));
     }
 }

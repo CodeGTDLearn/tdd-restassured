@@ -1,20 +1,13 @@
 package com.example.demo.repo.filtro;
 
-import com.example.demo.modelo.Pessoa;
-import com.example.demo.modelo.Telefone;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Arrays;
-
 import static lombok.Builder.Default;
 
-//@AllArgsConstructor
 @Builder
 @Getter
 public class FiltroPessoaCascade {
-//    private Pessoa pessoa;
 
     @Default
     private String nome = "";

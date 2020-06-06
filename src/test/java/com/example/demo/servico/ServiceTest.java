@@ -1,5 +1,6 @@
 package com.example.demo.servico;
 
+import com.example.demo.databuilders.ObjectMotherPessoa;
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.Telefone;
 import com.example.demo.repo.PessoaRepoInt;
@@ -17,6 +18,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
@@ -27,18 +30,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfeTel;
+import static com.example.demo.databuilders.ObjectMotherPessoa.*;
+import static com.example.demo.databuilders.ObjectMotherPessoa.pessoaComCpfeTel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
 
-@TestPropertySource("classpath:application.properties")
-@Sql(value = "/load-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "/clean-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@TestPropertySource("classpath:application-test.properties")
+@Sql(value = "/preload-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/clean-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DataJpaTest
 @RunWith(SpringRunner.class)
-public class PessoaServiceTest {
+public class ServiceTest {
 
     /*
     ATENCAO!!!!
@@ -50,6 +56,7 @@ public class PessoaServiceTest {
      */
     @MockBean
     private PessoaRepoInt repo;
+
     private PessoaServiceInt service;
 
     @Rule
@@ -66,16 +73,10 @@ public class PessoaServiceTest {
 
     @Test
     public void multiFilterTest() {
-        FiltroPessoaCascade filtro = FiltroPessoaCascade.builder()
-                .nome("xxx")
-                .cpf("4444")
-                .ddd("99")
-                .phone("38416516").build();
+        FiltroPessoaCascade filtro = FiltroPessoaCascade.builder().build();
 
-        Pessoa personResult1 = new Pessoa();
-        Pessoa personResult2 = new Pessoa();
-        personResult1.setNome("paulo");
-        personResult2.setNome("vinicius");
+        Pessoa personResult1 = pessoaComCpfeTel().gerar();
+        Pessoa personResult2 = pessoaComCpfeTel().gerar();
 
         when(repo.findByMultiFilterCascade(
                 filtro.getNome(),
@@ -83,10 +84,11 @@ public class PessoaServiceTest {
                 filtro.getDdd(),
                 filtro.getPhone())).thenReturn(Arrays.asList(personResult1, personResult2));
 
-        List<Pessoa> pessoas =
-                service.findByMultiFilterCascade(filtro);
+        List<Pessoa> pessoas = service.findByMultiFilterCascade(filtro);
 
         AssertionsForClassTypes.assertThat(pessoas.size()).isEqualTo(2);
+        assertThat(personResult1.getNome()).isEqualTo(pessoas.get(0).getNome());
+        assertThat(personResult2.getNome()).isEqualTo(pessoas.get(1).getNome());
     }
 
     @Test(expected = CpfDuplicadoException.class)
@@ -195,4 +197,27 @@ public class PessoaServiceTest {
         service.save(pessoa);
     }
 
+    @Test
+    public void findAllMockmvc() {
+        List<Pessoa> list = service.findAllMockmvc();
+        AssertionsForClassTypes.assertThat(list.size()).isEqualTo(list.size());
+    }
+
+    @Test
+    public void findByTelDdd() {
+        final String ddd = pessoa.getTelefones().get(0).getDdd();
+        final String numero = pessoa.getTelefones().get(0).getNumero();
+
+        when(repo.findByTelDdd(ddd, numero)).thenReturn(Optional.of(pessoa));
+
+        Pessoa person = service.findByTelDdd(ddd, numero).get();
+
+        verify(repo).findByTelDdd(ddd, numero);
+
+        //Library: org.assertj.core.api.Assertions.assertThat;
+        assertThat(person).isNotNull();
+        assertThat(person.getNome()).isEqualTo(person.getNome());
+        assertThat(person.getCpf()).isEqualTo(person.getCpf());
+        assertThat(person.getTelefones().get(0).getNumero()).isEqualTo(numero);
+    }
 }

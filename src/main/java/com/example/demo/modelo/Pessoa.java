@@ -1,8 +1,8 @@
 package com.example.demo.modelo;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;

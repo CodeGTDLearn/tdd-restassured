@@ -13,20 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PessoaServiceImpl implements PessoaServiceInt {
 
-//    @Autowired
+    @Autowired
     private PessoaRepoInt repo;
 
-//    @Autowired
+    @Autowired
     public PessoaServiceImpl(PessoaRepoInt repo) {
         this.repo = repo;
     }
 
     @Override
     public Pessoa save(Pessoa pessoa) throws TelDuplicadoException, CpfDuplicadoException {
+
         if (repo.findByCpf(pessoa.getCpf()).isPresent())
             throw new CpfDuplicadoException(CreateMessage.builder()
                     .text1(pessoa.getCpf())
@@ -35,6 +37,7 @@ public class PessoaServiceImpl implements PessoaServiceInt {
 
         final String ddd = pessoa.getTelefones().get(0).getDdd();
         final String numero = pessoa.getTelefones().get(0).getNumero();
+
         if (repo.findByTelDdd(ddd, numero).isPresent())
             throw new TelDuplicadoException(CreateMessage.builder()
                     .text1(ddd)
@@ -43,6 +46,13 @@ public class PessoaServiceImpl implements PessoaServiceInt {
                     .telDuplicity());
 
         return repo.save(pessoa);
+    }
+
+    @Override
+    public boolean delete(Pessoa pessoa) {
+        repo.delete(pessoa);
+        return repo.findByCpf(pessoa.getCpf()).isPresent();
+
     }
 
     @Override
@@ -63,4 +73,15 @@ public class PessoaServiceImpl implements PessoaServiceInt {
                 filter.getDdd(),
                 filter.getPhone());
     }
+
+    @Override
+    public List<Pessoa> findAllMockmvc() {
+        return repo.findAll();
+    }
+
+    @Override
+    public Optional<Pessoa> findByTelDdd(String ddd, String numero) {
+        return repo.findByTelDdd(ddd, numero);
+    }
+
 }

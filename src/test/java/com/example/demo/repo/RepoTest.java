@@ -2,12 +2,16 @@ package com.example.demo.repo;
 
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.repo.filtro.FiltroPessoaCascade;
+import jdk.nashorn.internal.ir.CallNode;
+import lombok.var;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -15,16 +19,30 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.demo.databuilders.PessoaBuilder.pessoaComCpfeTel;
+import static com.example.demo.databuilders.ObjectMotherPessoa.pessoaComCpfeTel;
+import static com.example.demo.repo.filtro.FiltroPessoaCascade.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.*;
 
+//AUTOCONFIGURA H2, HSQL, Derby, override application-test.properties
+@AutoConfigureTestDatabase(connection = HSQL)
 
-@TestPropertySource("classpath:application.properties")
-@Sql(value = "/load-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "/clean-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+//CONFIGURA usando o application-test.properties
+//Usa o application-test.properties
+//@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+//@TestPropertySource("classpath:application-test.properties")
+
+@Sql(value = "/preload-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/clean-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+
+@DirtiesContext //Diz ao TestFramework p/ fechar e recriar o contexto para testes posteriores.
+
+//Carrega JPA + MemoryDB embarcado p/ teste (Datasource substituido por MemoryDB Embarcado)
+//Nao Depende de Script SQL de PreLoad,
+//MAS permite Script SQL de PreLoad(preload-ScriptHSQL-dbTest.sql)
 @DataJpaTest
-@RunWith(SpringRunner.class)
-public class PessoaRepoTest {
+@RunWith(SpringRunner.class) // inicia o contexto de test do Spring + roda testes + permite multiplo frameworks de test
+public class RepoTest {
 
     @Autowired
     private PessoaRepoInt repo;
@@ -33,7 +51,7 @@ public class PessoaRepoTest {
     private Pessoa pessoa2;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         pessoa1 = pessoaComCpfeTel().gerar();
         pessoa2 = pessoaComCpfeTel().gerar();
         repo.save(pessoa1);
@@ -41,12 +59,12 @@ public class PessoaRepoTest {
 
     @After
     public void tearDown() {
-        repo.delete(pessoa1);
+        //  repo.delete(pessoa1);
+        repo.deleteAll();
     }
 
     @Test
     public void procura_pessoa_pelo_cpf() {
-
         Optional<Pessoa> optional = repo.findByCpf(pessoa1.getCpf());
         assertThat(optional.isPresent()).isTrue();
 
@@ -69,7 +87,6 @@ public class PessoaRepoTest {
 
         String ddd = pessoaSource.getTelefones().get(0).getDdd();
         String numero = pessoaSource.getTelefones().get(0).getNumero();
-        int teste = 1;
 
         Optional<Pessoa> optional2 = repo.findByTelDdd(ddd, numero);
         assertThat(optional2.isPresent()).isTrue();
@@ -92,20 +109,33 @@ public class PessoaRepoTest {
 
     @Test
     public void multiFilterTest() {
-        FiltroPessoaCascade filtro =
-                FiltroPessoaCascade
-                        .builder()
-                        .nome("a")
-                        .cpf("4")
-                        .phone("38416516")
-                        .build();
+        var personToTest = repo.findFirstByOrderByNomeAsc();
+
+        final String ddd = personToTest.get().getTelefones().get(0).getDdd();
+        final String nome = personToTest.get().getNome();
+        final String cpf = personToTest.get().getCpf();
+        final String numero = personToTest.get().getTelefones().get(0).getNumero();
+
+        FiltroPessoaCascade multiFilter = builder()
+                .nome(nome)
+                .cpf(cpf)
+                .ddd(ddd)
+                .phone(numero)
+                .build();
 
         List<Pessoa> pessoas =
                 repo.findByMultiFilterCascade(
-                        filtro.getNome(),
-                        filtro.getCpf(),
-                        filtro.getDdd(),
-                        filtro.getPhone());
+                        multiFilter.getNome(),
+                        multiFilter.getCpf(),
+                        multiFilter.getDdd(),
+                        multiFilter.getPhone());
+
         assertThat(pessoas.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void findAllMockmvc() {
+        List<Pessoa> list = repo.findAll();
+        assertThat(list.size()).isEqualTo(list.size());
     }
 }
