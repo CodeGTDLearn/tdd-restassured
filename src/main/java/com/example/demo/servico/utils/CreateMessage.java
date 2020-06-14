@@ -14,6 +14,10 @@ public class CreateMessage {
     private String text7;
     private String text8;
 
+    public String personNotFound() {
+        return "CPF: " + text1 + " nao encontrado!";
+    }
+
     public String cpfDuplicity() {
         return "CPF: " + text1 + " duplicado!";
     }

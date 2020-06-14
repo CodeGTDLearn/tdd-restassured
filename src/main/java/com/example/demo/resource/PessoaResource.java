@@ -5,11 +5,11 @@ import com.example.demo.modelo.Telefone;
 import com.example.demo.repo.filtro.FiltroPessoaCascade;
 import com.example.demo.servico.PessoaServiceInt;
 import com.example.demo.servico.exceptions.CpfDuplicadoException;
+import com.example.demo.servico.exceptions.PessoaNaoEncontradaException;
 import com.example.demo.servico.exceptions.TelDuplicadoException;
 import com.example.demo.servico.exceptions.TelephoneNotFoundException;
 import com.example.demo.servico.utils.ErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -56,6 +56,13 @@ public class PessoaResource {
         response.setHeader("Location", uri.toASCIIString());
 
         return new ResponseEntity<>(pessoaToBeSaved, CREATED);
+    }
+
+    @PutMapping("/{codigo}")
+    public ResponseEntity<Pessoa> put(@RequestBody Pessoa pessoa,
+                                          @PathVariable("codigo") String codigo) throws PessoaNaoEncontradaException {
+        Pessoa pessoaPut = service.put(pessoa, codigo);
+        return new ResponseEntity<>(pessoaPut, OK);
     }
 
     @PostMapping("/filtrar")

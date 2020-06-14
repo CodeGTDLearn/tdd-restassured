@@ -6,6 +6,7 @@ import com.example.demo.repo.PessoaRepoInt;
 import com.example.demo.repo.filtro.FiltroPessoaCascade;
 import com.example.demo.servico.PessoaServiceInt;
 import com.example.demo.servico.exceptions.CpfDuplicadoException;
+import com.example.demo.servico.exceptions.PessoaNaoEncontradaException;
 import com.example.demo.servico.exceptions.TelDuplicadoException;
 import com.example.demo.servico.exceptions.TelephoneNotFoundException;
 import com.example.demo.servico.utils.CreateMessage;
@@ -25,6 +26,7 @@ public class PessoaServiceImpl implements PessoaServiceInt {
     public PessoaServiceImpl(PessoaRepoInt repo) {
         this.repo = repo;
     }
+
 
     @Override
     public Pessoa save(Pessoa pessoa) throws TelDuplicadoException, CpfDuplicadoException {
@@ -47,6 +49,28 @@ public class PessoaServiceImpl implements PessoaServiceInt {
 
         return repo.save(pessoa);
     }
+
+    @Override
+    public Pessoa put(Pessoa pessoa, String codigo) throws PessoaNaoEncontradaException {
+
+        if (!repo.existsById(pessoa.getCodigo()))
+            throw new PessoaNaoEncontradaException(CreateMessage.builder()
+                    .text1(pessoa.getNome())
+                    .build()
+                    .personNotFound());
+
+        Optional<Pessoa> optional1 = repo.findByCodigo(pessoa.getCodigo());
+        Pessoa personToUpdate = optional1.get();
+
+        personToUpdate.setNome(pessoa.getNome());
+        personToUpdate.setCpf(pessoa.getCpf());
+        personToUpdate.setCodigo(pessoa.getCodigo());
+        personToUpdate.setTelefones(pessoa.getTelefones());
+        personToUpdate.setEnderecos(pessoa.getEnderecos());
+
+        return repo.save(personToUpdate);
+    }
+
 
     @Override
     public boolean delete(Pessoa pessoa) {

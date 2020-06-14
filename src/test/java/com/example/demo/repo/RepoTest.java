@@ -2,7 +2,6 @@ package com.example.demo.repo;
 
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.repo.filtro.FiltroPessoaCascade;
-import jdk.nashorn.internal.ir.CallNode;
 import lombok.var;
 import org.junit.After;
 import org.junit.Before;
@@ -12,14 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.demo.databuilders.ObjectMotherPessoa.pessoaComCpfeTel;
+import static com.example.demo.databuildersObMother.ObjectMotherPessoa.pessoaComCpfeTel;
 import static com.example.demo.repo.filtro.FiltroPessoaCascade.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.*;
@@ -32,14 +30,14 @@ import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.*;
 //@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 //@TestPropertySource("classpath:application-test.properties")
 
-@Sql(value = "/preload-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = "/clean-ScriptHSQL-dbTest.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "/data-mass-load.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/data-mass-clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 
 @DirtiesContext //Diz ao TestFramework p/ fechar e recriar o contexto para testes posteriores.
 
 //Carrega JPA + MemoryDB embarcado p/ teste (Datasource substituido por MemoryDB Embarcado)
 //Nao Depende de Script SQL de PreLoad,
-//MAS permite Script SQL de PreLoad(preload-ScriptHSQL-dbTest.sql)
+//MAS permite Script SQL de PreLoad(data-mass-load.sql)
 @DataJpaTest
 @RunWith(SpringRunner.class) // inicia o contexto de test do Spring + roda testes + permite multiplo frameworks de test
 public class RepoTest {
