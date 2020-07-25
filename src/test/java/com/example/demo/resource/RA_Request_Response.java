@@ -13,9 +13,6 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 
-//@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-//@RunWith(SpringRunner.class)
-//@TestPropertySource("classpath:application-test.properties")
 public class RA_Request_Response extends GlobalTestConfig {
 
     @Before

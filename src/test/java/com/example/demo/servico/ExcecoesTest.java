@@ -72,7 +72,7 @@ public class ExcecoesTest {
     public void blockSaveWithTelDuplicity() throws TelDuplicadoException, CpfDuplicadoException {
         String ddd = pessoa.getTelefones().get(0).getDdd();
         String numero = pessoa.getTelefones().get(0).getNumero();
-        when(repo.findByTelDdd(ddd, numero)).thenReturn(Optional.of(pessoa));
+        when(repo.findByTelDdd(ddd ,numero)).thenReturn(Optional.of(pessoa));
         service.save(pessoa);
 
     }
@@ -80,6 +80,7 @@ public class ExcecoesTest {
     //---Teste das EXCECOES:
     //      - As excecoes ECLODEM no service, portanto devem ser testadas no ServiceTest
     //---TESTANDO AS 03 MODALIDADES DE TESTE DE EXCECAO:
+
     //A) Expected
     @Test(expected = TelephoneNotFoundException.class)
     public void telephoneNotFoundException_ExpectedMethod() throws TelephoneNotFoundException {
@@ -111,7 +112,7 @@ public class ExcecoesTest {
 
             //Assert.assertThat: org.junit.Assert;
             //IS: org.hamcrest.CoreMatchers;
-            Assert.assertThat(erro.getMessage(), CoreMatchers.is(CreateMessage.builder()
+            Assert.assertThat(erro.getMessage() ,CoreMatchers.is(CreateMessage.builder()
                     .text1(tel.getDdd())
                     .text2(tel.getNumero())
                     .build()
@@ -138,7 +139,7 @@ public class ExcecoesTest {
         final String ddd = pessoa.getTelefones().get(0).getDdd();
         final String numero = pessoa.getTelefones().get(0).getNumero();
 
-        when(repo.findByTelDdd(ddd, numero)).thenReturn(Optional.of(pessoa));
+        when(repo.findByTelDdd(ddd ,numero)).thenReturn(Optional.of(pessoa));
         expExc.expect(TelDuplicadoException.class);
         expExc.expectMessage(CreateMessage.builder()
                 .text1(ddd)

@@ -8,7 +8,6 @@ import org.junit.Test;
 import static io.restassured.RestAssured.given;
 import static org.springframework.http.HttpStatus.OK;
 
-//@TestPropertySource("classpath:application-test.properties")
 public class RA_Schema extends GlobalTestConfig {
 
     @Before
@@ -18,18 +17,23 @@ public class RA_Schema extends GlobalTestConfig {
 
     @Test
     public void checaJsonSchemaFormatosJsonTest() {
-        //------- ACrescentar dependencia JSON-SCHEMA-VALIDATOR[REST ASSURE], no POM
+        //1) Acrescentar JSON-SCHEMA-VALIDATOR[REST ASSURE], no POM
+        //2) Montando o SCHEMA de validacao:
+        //   a) Usar o website: 'https://JSONSCHEMA.NET/HOME'
+        //   b) Rodar o controller/resource no postman/browser, 'copiar' o resultado em JSON obtido;
+        //   c) 'Colar' o resultado(JSON) obtido acima, no https://JSONSCHEMA.NET/HOME;
+        //   d) 'Copiar' o SCHEMA gerado em JSONSCHEMA.NET, num arquivo .JSON, na pasta resources
+        //   e) no Body do RestAssure, inserir:
+        //       - .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("RA_Schema-de-validacao.json"))
         given()
-
 
                 .when()
                 .get("users")
 
                 .then()
-
                 .statusCode(OK.value())
 
-                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("jsonValidacaoUsers.json"))
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("RA_Schema-de-validacao.json"))
         ;
 
     }

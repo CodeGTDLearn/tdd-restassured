@@ -22,11 +22,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RunWith(MockitoJUnitRunner.class) // <<< RestAssuremockmvcTest + Mockito
 public class RA_MockmvcUnit extends GlobalTestConfig {
 
-    @Mock
-    private PessoaServiceInt service;
-
     @InjectMocks
     private PessoaResource resource;
+
+    @Mock
+    private PessoaServiceInt service;
 
     @Before
     public void setUp() {
