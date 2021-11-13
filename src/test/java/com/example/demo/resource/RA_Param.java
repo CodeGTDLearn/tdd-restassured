@@ -120,7 +120,17 @@ public class RA_Param extends GlobalTestConfig {
 
     @Test
     public void findByDddAndTelPATHPARAM() {
-//        init();
+        // PATH-PARAM + QUERY-PARAM:
+        //    given().log().all()
+        //           .pathParam("Id", "1234")
+        //           .queryParam("Type", "CHQ")
+        //           .when()
+        //           .get("https://localhost/v1/agreement/{Id}");
+        //
+        //        FINAL-RESULT-URI:
+        //           Request URI: https://localhost/agreement/1234?Type=CHQ
+
+
         final String nome = pessoaSource1.getNome();
         final String cpf = pessoaSource1.getCpf();
         final int codigo = pessoaSource1.getCodigo().intValue();
@@ -164,6 +174,16 @@ public class RA_Param extends GlobalTestConfig {
 
     @Test
     public void findByDddAndTelPARAMinLINE() {
+        // PATH-PARAM + QUERY-PARAM:
+        //    given().log().all()
+        //           .pathParam("Id", "1234")
+        //           .queryParam("Type", "CHQ")
+        //           .when()
+        //           .get("https://localhost/v1/agreement/{Id}");
+        //
+        //        FINAL-RESULT-URI:
+        //           Request URI: https://localhost/agreement/1234?Type=CHQ
+
 
         final String nome = pessoaSource1.getNome();
         final String cpf = pessoaSource1.getCpf();
@@ -208,6 +228,16 @@ public class RA_Param extends GlobalTestConfig {
 
     @Test
     public void findByDddAndTelWithNoReturnException() {
+        // PATH-PARAM + QUERY-PARAM:
+        //    given().log().all()
+        //           .pathParam("Id", "1234")
+        //           .queryParam("Type", "CHQ")
+        //           .when()
+        //           .get("https://localhost/v1/agreement/{Id}");
+        //
+        //        FINAL-RESULT-URI:
+        //           Request URI: https://localhost/agreement/1234?Type=CHQ
+
         Optional<Pessoa> optional2 = repo.findFirstByOrderByCpfAsc();
         Pessoa pessoaSource2 = optional2.get();
 
